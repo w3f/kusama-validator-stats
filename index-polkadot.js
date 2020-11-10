@@ -35,16 +35,24 @@ let network = 'polkadot'; // default to polkadot network (can be changed using c
   const totalKSM = parseInt(totalIssuance.toString())
   const totalBondingStake = await api.query.staking.erasTotalStake(currentEra.toString())
 
+  let maxMin = Number.MIN_VALUE;
+  let minMin = Number.MAX_VALUE;
+  let averageTotalStake = 0;
+  let averageTotalCommission = 0;
+
+
   for (let i = 0; i < currentValidators.length; i++) {
     const validatorStake = await api.query.staking.erasStakers(currentEra.toString(), currentValidators[i])
-    const validatorComissionRate = await api.query.staking.erasValidatorPrefs(currentEra.toString(), currentValidators[i])
+    const validatorCommissionRate = await api.query.staking.erasValidatorPrefs(currentEra.toString(), currentValidators[i])
     const validatorTotalStake = validatorStake['total'].toString() / DOT_DECIMAL_PLACES
     const validatorOwnStake = validatorStake['own'].toString() / DOT_DECIMAL_PLACES
     const validatorNominators = validatorStake['others'].toJSON()
 
-    check(currentValidators[i].toString(), parseInt(validatorTotalStake), parseInt(validatorComissionRate['commission'].toString()))
+    check(currentValidators[i].toString(), parseInt(validatorTotalStake), parseInt(validatorCommissionRate['commission'].toString()))
 
     console.log(`Stash Address: ${currentValidators[i].toString()}.\n\tTotal stake: ${validatorTotalStake}\n\tSelf stake: ${validatorOwnStake} ${getSuffix()}`)
+    averageTotalStake += validatorTotalStake / currentValidators.length;
+    averageTotalCommission += parseInt(validatorCommissionRate['commission'].toString()) / currentValidators.length;
     let max = Number.MIN_VALUE;
     let min = Number.MAX_VALUE;
     let avg = 0;
@@ -53,13 +61,16 @@ let network = 'polkadot'; // default to polkadot network (can be changed using c
       if(validatorNominators[j].value >= max) {
         max = validatorNominators[j].value;
       }
-      else if(validatorNominators[j].value <= min) {
+      if(validatorNominators[j].value <= min) {
         min = validatorNominators[j].value;
       }
       avg += (validatorNominators[j].value / validatorNominators.length);
     }
 
-    console.log(`\tCommission: ${validatorComissionRate['commission'].toString() / 10000000}%`)
+    minMin = Math.min(min, minMin); // alternatively, if(min < minMin) minMin = min;
+    maxMin = Math.max(min, maxMin); // alternatively, if(min > maxMin) maxMin = min;
+
+    console.log(`\tCommission: ${validatorCommissionRate['commission'].toString() / 10000000}%`)
     console.log('\tNominators:', validatorNominators.length)
     console.log('\tMaximum Stake:', max / DOT_DECIMAL_PLACES)
     console.log('\tMinimum Stake:', min / DOT_DECIMAL_PLACES)
@@ -76,6 +87,14 @@ let network = 'polkadot'; // default to polkadot network (can be changed using c
   console.log(`Lowest-staked validator: ${lowest} : ${lowestAmount} ${getSuffix()}`)
   console.log(`Highest commission validator: ${highestCommission} : ${highestCommissionAmount / 10000000}%`)
   console.log(`Lowest commission validator: ${lowestCommission} : ${lowestCommissionAmount / 10000000}%`)
+
+  // part 3
+  console.log("Lowest Minimal Nomination:", minMin / DOT_DECIMAL_PLACES)
+  console.log("Highest Minimal Nomination:", maxMin / DOT_DECIMAL_PLACES)
+
+  // part 4
+  console.log(`Average Total Stake: ${averageTotalStake}`)
+  console.log(`Average Total Commission: ${averageTotalCommission / 10000000}%`)
 
   process.exit()
 })()
