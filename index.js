@@ -1,6 +1,5 @@
 const{ ApiPromise, WsProvider } = require('@polkadot/api')
 const { isHex } = require('@polkadot/util')
-
 const DOT_DECIMAL_PLACES = 1000000000000;
 let lowest = "no one";
 let highest = "no one";

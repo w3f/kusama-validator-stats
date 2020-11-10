@@ -9,7 +9,7 @@
   "author": "Anson Lau",
   "license": "ISC",
   "dependencies": {
-    "@polkadot/api": "1.8.0-beta.3",
+    "@polkadot/api": "^2.6.1",
     "@polkadot/util": "2.7.0-beta.5"
   }
 }

@@ -1,7 +1,7 @@
 const{ ApiPromise, WsProvider } = require('@polkadot/api')
 const { isHex } = require('@polkadot/util')
 
-const DOT_DECIMAL_PLACES = 10000000000;
+let DOT_DECIMAL_PLACES = 10000000000;
 let lowest = "no one";
 let highest = "no one";
 let highestAmount = NaN;
@@ -10,9 +10,21 @@ let highestCommission = "no one";
 let lowestCommission = "no one";
 let highestCommissionAmount = NaN;
 let lowestCommissionAmount = NaN;
+let network = 'polkadot'; // default to polkadot network (can be changed using command line arg)
 
 (async () => {
-    const provider = new WsProvider('wss://rpc.polkadot.io')
+    args = process.argv
+    let provider = null;
+    if(args.length > 2 && args[2] === 'kusama'){ // if there is a command line arg for kusama, use kusama network
+        console.log('Connecting to Kusama')
+        network = 'kusama'
+        provider = new WsProvider('wss://kusama-rpc.polkadot.io')
+        DOT_DECIMAL_PLACES *= 100
+    }
+    else{ // default to polkadot
+        console.log('Connecting to Polkadot')
+        provider = new WsProvider('wss://rpc.polkadot.io')
+    }
     const api = await ApiPromise.create({ provider })
     const [ currentValidators, totalIssuance, currentEra ] = await Promise.all([
       api.query.session.validators(),
@@ -32,9 +44,9 @@ let lowestCommissionAmount = NaN;
       
       check(currentValidators[i].toString(), parseInt(validatorTotalStake), parseInt(validatorComissionRate['commission'].toString()))
 
-      console.log(`Stash Address: ${currentValidators[i].toString()}.\n\tTotal stake: ${validatorTotalStake}\n\tSelf stake: ${validatorOwnStake}`)
+      console.log(`Stash Address: ${currentValidators[i].toString()}.\n\tTotal stake: ${validatorTotalStake}\n\tSelf stake: ${validatorOwnStake} ${getSuffix()}`)
       for (let j=0; j<validatorNominators.length; j++) {
-        console.log(`\tAddress: ${validatorNominators[j].who}, Stake: ${validatorNominators[j].value / DOT_DECIMAL_PLACES}`)
+        console.log(`\tAddress: ${validatorNominators[j].who}, Stake: ${validatorNominators[j].value / DOT_DECIMAL_PLACES} ${getSuffix()}`)
       }
       console.log(`\tCommission: ${validatorComissionRate['commission'].toString() / 10000000}%`)
       console.log('\tNominators:', validatorNominators.length)
@@ -43,11 +55,11 @@ let lowestCommissionAmount = NaN;
 		console.log()
     console.log("\nSummary Data:")
     console.log(`Total DOT: ${totalKSM / DOT_DECIMAL_PLACES}`)
-    console.log(`Bonding Stake: ${totalBondingStake.toString() / DOT_DECIMAL_PLACES} KSM`)
+    console.log(`Bonding Stake: ${totalBondingStake.toString() / DOT_DECIMAL_PLACES} ${getSuffix()}`)
     console.log(`Staking Rate: ${totalBondingStake.toString() / totalKSM * 100} %`)
 
-    console.log(`Highest-staked validator: ${highest} : ${highestAmount} KSM`)
-    console.log(`Lowest-staked validator: ${lowest} : ${lowestAmount} KSM`)
+    console.log(`Highest-staked validator: ${highest} : ${highestAmount} ${getSuffix()}`)
+    console.log(`Lowest-staked validator: ${lowest} : ${lowestAmount} ${getSuffix()}`)
     console.log(`Highest commission validator: ${highestCommission} : ${highestCommissionAmount / 10000000}%`)
     console.log(`Lowest commission validator: ${lowestCommission} : ${lowestCommissionAmount / 10000000}%`)
 
@@ -84,4 +96,9 @@ const check = (currentValidator, stake, commission) => {
         lowestCommissionAmount = commission
 	    }
 	}
+}
+
+function getSuffix(){
+    if(network == 'kusama') return 'KSM';
+    else return 'DOT';
 }
