@@ -72,9 +72,9 @@ let network = 'polkadot'; // default to polkadot network (can be changed using c
 
     console.log(`\tCommission: ${validatorCommissionRate['commission'].toString() / 10000000}%`)
     console.log('\tNominators:', validatorNominators.length)
-    console.log('\tMaximum Stake:', max / DOT_DECIMAL_PLACES)
-    console.log('\tMinimum Stake:', min / DOT_DECIMAL_PLACES)
-    console.log('\tAverage Stake:', avg / DOT_DECIMAL_PLACES)
+    console.log('\tMaximum Stake:', max / DOT_DECIMAL_PLACES, getSuffix())
+    console.log('\tMinimum Stake:', min / DOT_DECIMAL_PLACES, getSuffix())
+    console.log('\tAverage Stake:', avg / DOT_DECIMAL_PLACES, getSuffix())
   }
 
   console.log()
@@ -89,11 +89,11 @@ let network = 'polkadot'; // default to polkadot network (can be changed using c
   console.log(`Lowest commission validator: ${lowestCommission} : ${lowestCommissionAmount / 10000000}%`)
 
   // part 3
-  console.log("Lowest Minimal Nomination:", minMin / DOT_DECIMAL_PLACES)
-  console.log("Highest Minimal Nomination:", maxMin / DOT_DECIMAL_PLACES)
+  console.log("Lowest Minimal Nomination:", minMin / DOT_DECIMAL_PLACES, getSuffix())
+  console.log("Highest Minimal Nomination:", maxMin / DOT_DECIMAL_PLACES, getSuffix())
 
   // part 4
-  console.log(`Average Total Stake: ${averageTotalStake}`)
+  console.log(`Average Total Stake: ${averageTotalStake} ${getSuffix()}`)
   console.log(`Average Total Commission: ${averageTotalCommission / 10000000}%`)
 
   process.exit()
