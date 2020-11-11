@@ -40,7 +40,7 @@ let lowestMinNominator = "no one";
   const totalBondingStake = await api.query.staking.erasTotalStake(currentEra.toString())
 
   let averageTotalStake = 0;
-  let averageTotalCommission = 0;
+  let averageCommission = 0;
 
 
   for (let i = 0; i < currentValidators.length; i++) {
@@ -54,7 +54,7 @@ let lowestMinNominator = "no one";
 
     console.log(`Stash Address: ${currentValidators[i].toString()}.\n\tTotal stake: ${validatorTotalStake}\n\tSelf stake: ${validatorOwnStake} ${getSuffix()}`)
     averageTotalStake += validatorTotalStake / currentValidators.length;
-    averageTotalCommission += parseInt(validatorCommissionRate['commission'].toString()) / currentValidators.length;
+    averageCommission += parseInt(validatorCommissionRate['commission'].toString()) / currentValidators.length;
     let max = NaN;
     let min = NaN;
     let minNominator = "no one";
@@ -92,7 +92,7 @@ let lowestMinNominator = "no one";
 
   console.log()
   console.log("\nSummary Data:")
-  console.log(`Total DOT: ${totalKSM / DOT_DECIMAL_PLACES}`)
+  console.log(`Total ${getSuffix()}: ${totalKSM / DOT_DECIMAL_PLACES} ${getSuffix()}`)
   console.log(`Bonding Stake: ${totalBondingStake.toString() / DOT_DECIMAL_PLACES} ${getSuffix()}`)
   console.log(`Staking Rate: ${totalBondingStake.toString() / totalKSM * 100} %`)
 
@@ -107,7 +107,7 @@ let lowestMinNominator = "no one";
 
   // part 4
   console.log(`Average Total Stake: ${averageTotalStake} ${getSuffix()}`)
-  console.log(`Average Total Commission: ${averageTotalCommission / 10000000}%`)
+  console.log(`Average Commission: ${averageCommission / 10000000}%`)
 
   process.exit()
 })()
