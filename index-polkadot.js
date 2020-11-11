@@ -10,7 +10,7 @@ let highestCommission = "no one";
 let lowestCommission = "no one";
 let highestCommissionAmount = NaN;
 let lowestCommissionAmount = NaN;
-let network = 'polkadot'; // default to polkadot network (can be changed using command line arg)
+let network = 'polkadot'; // default to polkadot network (can be changed to kusama using command line arg)
 let highestMinAmount = NaN;
 let highestMinNominator = "no one";
 let lowestMinAmount = NaN;
@@ -55,20 +55,26 @@ let lowestMinNominator = "no one";
     console.log(`Stash Address: ${currentValidators[i].toString()}.\n\tTotal stake: ${validatorTotalStake}\n\tSelf stake: ${validatorOwnStake} ${getSuffix()}`)
     averageTotalStake += validatorTotalStake / currentValidators.length;
     averageTotalCommission += parseInt(validatorCommissionRate['commission'].toString()) / currentValidators.length;
-    let max = Number.MIN_VALUE;
-    let min = Number.MAX_VALUE;
+    let max = NaN;
+    let min = NaN;
     let minNominator = "no one";
     let maxNominator = "no one";
     let avg = 0;
     for (let j = 0; j < validatorNominators.length; j++) {
       console.log(`\tAddress: ${validatorNominators[j].who}, Stake: ${validatorNominators[j].value / DOT_DECIMAL_PLACES} ${getSuffix()}`)
-      if(validatorNominators[j].value >= max) {
-        max = validatorNominators[j].value;
-        maxNominator = validatorNominators[j].who
+      if(isNaN(max)) {
+        min = max = validatorNominators[j].value;
+        minNominator = maxNominator = validatorNominators[j].who
       }
-      if(validatorNominators[j].value <= min) {
-        min = validatorNominators[j].value;
-        minNominator = validatorNominators[j].who;
+      else{
+        if(validatorNominators[j].value >= max) {
+          max = validatorNominators[j].value;
+          maxNominator = validatorNominators[j].who
+        }
+        if(validatorNominators[j].value <= min) {
+          min = validatorNominators[j].value;
+          minNominator = validatorNominators[j].who;
+        }
       }
       avg += (validatorNominators[j].value / validatorNominators.length);
     }
@@ -107,6 +113,9 @@ let lowestMinNominator = "no one";
 })()
 
 const checkMinStake = (stake, currentValidator) => {
+  if(isNaN(stake)){
+    return;
+  }
   if (isNaN(lowestMinAmount)) {
     lowestMinAmount = highestMinAmount = stake;
     lowestMinNominator = currentValidator;
