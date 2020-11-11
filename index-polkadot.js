@@ -11,6 +11,10 @@ let lowestCommission = "no one";
 let highestCommissionAmount = NaN;
 let lowestCommissionAmount = NaN;
 let network = 'polkadot'; // default to polkadot network (can be changed using command line arg)
+let highestMinAmount = NaN;
+let highestMinNominator = "no one";
+let lowestMinAmount = NaN;
+let lowestMinNominator = "no one";
 
 (async () => {
   args = process.argv
@@ -35,8 +39,6 @@ let network = 'polkadot'; // default to polkadot network (can be changed using c
   const totalKSM = parseInt(totalIssuance.toString())
   const totalBondingStake = await api.query.staking.erasTotalStake(currentEra.toString())
 
-  let maxMin = Number.MIN_VALUE;
-  let minMin = Number.MAX_VALUE;
   let averageTotalStake = 0;
   let averageTotalCommission = 0;
 
@@ -55,25 +57,30 @@ let network = 'polkadot'; // default to polkadot network (can be changed using c
     averageTotalCommission += parseInt(validatorCommissionRate['commission'].toString()) / currentValidators.length;
     let max = Number.MIN_VALUE;
     let min = Number.MAX_VALUE;
+    let minNominator = "no one";
+    let maxNominator = "no one";
     let avg = 0;
     for (let j = 0; j < validatorNominators.length; j++) {
       console.log(`\tAddress: ${validatorNominators[j].who}, Stake: ${validatorNominators[j].value / DOT_DECIMAL_PLACES} ${getSuffix()}`)
       if(validatorNominators[j].value >= max) {
         max = validatorNominators[j].value;
+        maxNominator = validatorNominators[j].who
       }
       if(validatorNominators[j].value <= min) {
         min = validatorNominators[j].value;
+        minNominator = validatorNominators[j].who;
       }
       avg += (validatorNominators[j].value / validatorNominators.length);
     }
 
-    minMin = Math.min(min, minMin); // alternatively, if(min < minMin) minMin = min;
-    maxMin = Math.max(min, maxMin); // alternatively, if(min > maxMin) maxMin = min;
+    checkMinStake(min, minNominator)
 
     console.log(`\tCommission: ${validatorCommissionRate['commission'].toString() / 10000000}%`)
     console.log('\tNominators:', validatorNominators.length)
-    console.log('\tMaximum Stake:', max / DOT_DECIMAL_PLACES, getSuffix())
-    console.log('\tMinimum Stake:', min / DOT_DECIMAL_PLACES, getSuffix())
+    console.log(`\tMin Nominator: ${minNominator} : ${min / DOT_DECIMAL_PLACES} ${getSuffix()}`)
+    console.log(`\tMax Nominator: ${maxNominator} : ${max / DOT_DECIMAL_PLACES} ${getSuffix()}`)
+    // console.log('\tMaximum Stake:', max / DOT_DECIMAL_PLACES, getSuffix())
+    // console.log('\tMinimum Stake:', min / DOT_DECIMAL_PLACES, getSuffix())
     console.log('\tAverage Stake:', avg / DOT_DECIMAL_PLACES, getSuffix())
   }
 
@@ -89,8 +96,8 @@ let network = 'polkadot'; // default to polkadot network (can be changed using c
   console.log(`Lowest commission validator: ${lowestCommission} : ${lowestCommissionAmount / 10000000}%`)
 
   // part 3
-  console.log("Lowest Minimal Nomination:", minMin / DOT_DECIMAL_PLACES, getSuffix())
-  console.log("Highest Minimal Nomination:", maxMin / DOT_DECIMAL_PLACES, getSuffix())
+  console.log(`Lowest Minimal Nominator: ${lowestMinNominator} : ${lowestMinAmount / DOT_DECIMAL_PLACES} ${getSuffix()}`)
+  console.log(`Highest Minimal Nominator: ${highestMinNominator} : ${highestMinAmount / DOT_DECIMAL_PLACES} ${getSuffix()}`)  
 
   // part 4
   console.log(`Average Total Stake: ${averageTotalStake} ${getSuffix()}`)
@@ -98,6 +105,24 @@ let network = 'polkadot'; // default to polkadot network (can be changed using c
 
   process.exit()
 })()
+
+const checkMinStake = (stake, currentValidator) => {
+  if (isNaN(lowestMinAmount)) {
+    lowestMinAmount = highestMinAmount = stake;
+    lowestMinNominator = currentValidator;
+    highestMinNominator = currentValidator;
+  }
+  else {
+    if (stake < lowestMinAmount) {
+      lowestMinAmount = stake;
+      lowestMinNominator = currentValidator;
+    } 
+    else if (stake > highestMinAmount) {
+      highestMinAmount = stake;
+      highestMinNominator = currentValidator;
+    }
+  }
+}
 
 
 const check = (currentValidator, stake, commission) => {
