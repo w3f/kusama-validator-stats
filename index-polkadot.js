@@ -3,9 +3,11 @@ const { isHex } = require('@polkadot/util')
 
 let DOT_DECIMAL_PLACES = 10000000000;
 let lowest = "no one";
+let lowestNonZeroValidator = "no one";
 let highest = "no one";
 let highestAmount = NaN;
 let lowestAmount = NaN;
+let lowestNonZeroAmount = NaN;
 let highestCommission = "no one";
 let lowestCommission = "no one";
 let highestCommissionAmount = NaN;
@@ -13,7 +15,9 @@ let lowestCommissionAmount = NaN;
 let network = 'polkadot'; // default to polkadot network (can be changed to kusama using command line arg)
 let highestMinAmount = NaN;
 let highestMinNominator = "no one";
-let lowestMinAmount = NaN;
+let lowestMinStake = NaN;
+// let lowestNonZeroMinNominator = "no one";
+// let lowestNonZeroMinStake = NaN;
 let lowestMinNominator = "no one";
 
 (async () => {
@@ -102,7 +106,8 @@ let lowestMinNominator = "no one";
   console.log(`Lowest commission validator: ${lowestCommission} : ${lowestCommissionAmount / 10000000}%`)
 
   // part 3
-  console.log(`Lowest Minimal Nominator: ${lowestMinNominator} : ${lowestMinAmount / DOT_DECIMAL_PLACES} ${getSuffix()}`)
+  console.log(`Lowest Minimal Nominator: ${lowestMinNominator} : ${lowestMinStake / DOT_DECIMAL_PLACES} ${getSuffix()}`)
+  // console.log(`Lowest Non-Zero Minimal Nominator: ${lowestNonZeroMinNominator} : ${lowestNonZeroMinStake / DOT_DECIMAL_PLACES} ${getSuffix()}`)
   console.log(`Highest Minimal Nominator: ${highestMinNominator} : ${highestMinAmount / DOT_DECIMAL_PLACES} ${getSuffix()}`)  
 
   // part 4
@@ -112,23 +117,23 @@ let lowestMinNominator = "no one";
   process.exit()
 })()
 
-const checkMinStake = (stake, currentValidator) => {
+const checkMinStake = (stake, currentNominator) => {
   if(isNaN(stake)){
     return;
   }
-  if (isNaN(lowestMinAmount)) {
-    lowestMinAmount = highestMinAmount = stake;
-    lowestMinNominator = currentValidator;
-    highestMinNominator = currentValidator;
+  if (isNaN(lowestMinStake)) {
+    lowestMinStake = highestMinAmount = stake;
+    lowestMinNominator = currentNominator;
+    highestMinNominator = currentNominator;
   }
   else {
-    if (stake < lowestMinAmount) {
-      lowestMinAmount = stake;
-      lowestMinNominator = currentValidator;
+    if (stake < lowestMinStake) {
+      lowestMinStake = stake;
+      lowestMinNominator = currentNominator;
     } 
     else if (stake > highestMinAmount) {
       highestMinAmount = stake;
-      highestMinNominator = currentValidator;
+      highestMinNominator = currentNominator;
     }
   }
 }
@@ -140,6 +145,10 @@ const check = (currentValidator, stake, commission) => {
     // first.  Set this validator to highest and lowest everything.
     lowest = highest = currentValidator
     lowestAmount = highestAmount = stake
+    if(stake > 0){
+      lowestNonZeroAmount = stake
+      lowestNonZeroValidator = stake
+    }
     lowestCommission = highestCommission = currentValidator
     lowestCommissionAmount = highestCommissionAmount = commission
   } else {
@@ -151,6 +160,12 @@ const check = (currentValidator, stake, commission) => {
     } else if (stake < lowestAmount) {
       lowest = currentValidator
       lowestAmount = stake
+    }
+
+    // Check if current stake is less than the lowest non-zero stake
+    if(stake > 0 && stake < lowestNonZeroAmount){
+      lowestNonZeroValidator = currentValidator
+      lowestNonZeroAmount = stake
     }
 
     // Check commissions
