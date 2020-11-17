@@ -3,9 +3,11 @@ const { isHex } = require('@polkadot/util')
 
 let DOT_DECIMAL_PLACES = 10000000000;
 let lowest = "no one";
+let lowestNonZeroValidator = "no one";
 let highest = "no one";
 let highestAmount = NaN;
 let lowestAmount = NaN;
+let lowestNonZeroAmount = NaN;
 let highestCommission = "no one";
 let lowestCommission = "no one";
 let highestCommissionAmount = NaN;
@@ -13,7 +15,14 @@ let lowestCommissionAmount = NaN;
 let network = 'polkadot'; // default to polkadot network (can be changed to kusama using command line arg)
 let highestMinAmount = NaN;
 let highestMinNominator = "no one";
-let lowestMinAmount = NaN;
+let highestMinAmountNon100 = NaN; // Tracks highest min nomination for non 100% commission validators
+let highestMinNominatorNon100 = "no one";
+let countNon100 = 0; // Number of non 100% commission validators
+let averageMinNomination = NaN; // Average minimum nomination across all validators
+let averageMinNominationNon100 = NaN; // Average minimum nomination for non 100% commission validators
+let lowestMinStake = NaN;
+// let lowestNonZeroMinNominator = "no one";
+// let lowestNonZeroMinStake = NaN;
 let lowestMinNominator = "no one";
 
 (async () => {
@@ -48,6 +57,7 @@ let lowestMinNominator = "no one";
 
 
 
+
   // first count the number of validators that aren't taking 100% commission (used for finding average commission)
   for (let i=0; i<currentValidators.length; i++){
     const validatorCommissionRate = await api.query.staking.erasValidatorPrefs(currentEra.toString(), currentValidators[i])
@@ -56,6 +66,7 @@ let lowestMinNominator = "no one";
       countNon100++;
     }
     totalNominators++;
+
   }
 
 
@@ -71,7 +82,14 @@ let lowestMinNominator = "no one";
     console.log(`Stash Address: ${currentValidators[i].toString()}.\n\tTotal stake: ${validatorTotalStake}\n\tSelf stake: ${validatorOwnStake} ${getSuffix()}`)
 
     averageTotalStake += validatorTotalStake / currentValidators.length;
-    averageTotalCommission += parseInt(validatorCommissionRate['commission'].toString()) / currentValidators.length;
+    averageCommission += parseInt(validatorCommissionRate['commission'].toString()) / currentValidators.length;
+    let thisCommission = parseInt(validatorCommissionRate['commission'].toString()) / 10000000;
+    if(thisCommission < 100){
+      averageStakeNon100 += validatorTotalStake / countNon100;
+      averageCommissionNon100 += thisCommission / countNon100;
+    }
+
+
     let max = NaN;
     let min = NaN;
     let minNominator = "no one";
@@ -81,12 +99,12 @@ let lowestMinNominator = "no one";
       console.log(`\tAddress: ${validatorNominators[j].who}, Stake: ${validatorNominators[j].value / DOT_DECIMAL_PLACES} ${getSuffix()}`)
       if(isNaN(max)) {
         min = max = validatorNominators[j].value;
-        minNominator = maxNominator = validatorNominators[j].who
+        minNominator = maxNominator = validatorNominators[j].who;
       }
       else{
         if(validatorNominators[j].value >= max) {
           max = validatorNominators[j].value;
-          maxNominator = validatorNominators[j].who
+          maxNominator = validatorNominators[j].who;
         }
         if(validatorNominators[j].value <= min) {
           min = validatorNominators[j].value;
@@ -106,6 +124,9 @@ let lowestMinNominator = "no one";
       averageMinNomination += min/totalNominators;
     }
     checkMinStake(min, minNominator)
+    if(thisCommission < 100) {
+      checkNon100(min, minNominator)
+    }
 
     if(thisCommission < 100) {
       checkNon100(min, minNominator)
@@ -123,18 +144,19 @@ let lowestMinNominator = "no one";
     console.log(`\tMax Nominator: ${maxNominator} : ${max / DOT_DECIMAL_PLACES} ${getSuffix()}`)
     // console.log('\tMaximum Stake:', max / DOT_DECIMAL_PLACES, getSuffix())
     // console.log('\tMinimum Stake:', min / DOT_DECIMAL_PLACES, getSuffix())
-    console.log('\tAverage Stake:', avg / DOT_DECIMAL_PLACES, getSuffix())
+    console.log('\tAverage Nominator Stake:', avg / DOT_DECIMAL_PLACES, getSuffix())
   }
 
   console.log()
   console.log("\nSummary Data:")
-  console.log(`Total DOT: ${totalKSM / DOT_DECIMAL_PLACES}`)
+  console.log(`Total ${getSuffix()}: ${totalKSM / DOT_DECIMAL_PLACES} ${getSuffix()}`)
   console.log(`Bonding Stake: ${totalBondingStake.toString() / DOT_DECIMAL_PLACES} ${getSuffix()}`)
   console.log(`Staking Rate: ${totalBondingStake.toString() / totalKSM * 100} %`)
   console.log(`Total Number of Unique Nominators: ${uniqueNominators.size}`)
 
   console.log(`Highest-staked validator: ${highest} : ${highestAmount} ${getSuffix()}`)
   console.log(`Lowest-staked validator: ${lowest} : ${lowestAmount} ${getSuffix()}`)
+  console.log(`Lowest-staked(non-zero) validator: ${lowestNonZeroValidator} : ${lowestNonZeroAmount} ${getSuffix()}`)
   console.log(`Highest commission validator: ${highestCommission} : ${highestCommissionAmount / 10000000}%`)
   console.log(`Lowest commission validator: ${lowestCommission} : ${lowestCommissionAmount / 10000000}%`)
 
@@ -148,30 +170,51 @@ let lowestMinNominator = "no one";
 
 
   // part 4
-  console.log(`Average Total Stake: ${averageTotalStake} ${getSuffix()}`)
-  console.log(`Average Total Commission: ${averageTotalCommission / 10000000}%`)
+  console.log(`Average Stake Per Validator: ${averageTotalStake} ${getSuffix()}`)
+  console.log(`Average Commission: ${averageCommission / 10000000}%`)
+  console.log(`Average Stake (Among Non 100% Commission Validators): ${averageStakeNon100} ${getSuffix()}`)
+  console.log(`Average Commission (Among Non 100% Commission Validators): ${averageCommissionNon100}%`)
+
 
 
   process.exit()
 })()
 
-const checkMinStake = (stake, currentValidator) => {
+
+const checkNon100 = (stake, currentNominator) => {
+  if(isNaN(stake)){
+    return
+  }
+  if(isNaN(highestMinAmountNon100)) {
+    highestMinNominatorNon100 = currentNominator
+    highestMinAmountNon100 = stake
+  }
+  else{
+    if(stake > highestMinAmountNon100){
+      highestMinAmountNon100 = stake
+      highestMinNominatorNon100 = currentNominator
+    }
+  }
+}
+
+const checkMinStake = (stake, currentNominator) => {
   if(isNaN(stake)){
     return;
   }
-  if (isNaN(lowestMinAmount)) {
-    lowestMinAmount = highestMinAmount = stake;
-    lowestMinNominator = currentValidator;
-    highestMinNominator = currentValidator;
+  if (isNaN(lowestMinStake)) {
+    lowestMinStake = highestMinAmount = stake;
+    lowestMinNominator = currentNominator;
+    highestMinNominator = currentNominator;
   }
   else {
     if (stake < lowestMinStake) {
       lowestMinStake = stake;
       lowestMinNominator = currentNominator;
     }
+
     else if (stake > highestMinAmount) {
       highestMinAmount = stake;
-      highestMinNominator = currentValidator;
+      highestMinNominator = currentNominator;
     }
   }
 }
@@ -183,6 +226,10 @@ const check = (currentValidator, stake, commission) => {
     // first.  Set this validator to highest and lowest everything.
     lowest = highest = currentValidator
     lowestAmount = highestAmount = stake
+    if(stake > 0){
+      lowestNonZeroAmount = stake
+      lowestNonZeroValidator = stake
+    }
     lowestCommission = highestCommission = currentValidator
     lowestCommissionAmount = highestCommissionAmount = commission
   } else {
@@ -194,6 +241,12 @@ const check = (currentValidator, stake, commission) => {
     } else if (stake < lowestAmount) {
       lowest = currentValidator
       lowestAmount = stake
+    }
+
+    // Check if current stake is less than the lowest non-zero stake
+    if(stake > 0 && stake < lowestNonZeroAmount){
+      lowestNonZeroValidator = currentValidator
+      lowestNonZeroAmount = stake
     }
 
     // Check commissions
