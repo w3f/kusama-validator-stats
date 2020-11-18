@@ -110,18 +110,15 @@ def gen_validator_total_stake():
         label = '< ' + low
         ranges.append(label)
 
-
     plt.xlabel("Stake (in DOT/KSM)")
     plt.ylabel("Number of Validators")
     plt.title("Validators by Stake", fontsize=15)
     plt.bar(ranges, counts, color='#E6007A')
-    angle = min(number_of_bars//10, 6)
+    angle = min(number_of_bars//9, 6)
     plt.xticks(rotation=15*angle)
     print(ranges)
     plt.savefig(output_file, dpi=300, bbox_inches='tight', pad_inches=.25)
     print("Saved Validator Total Stake Graph as", output_file)
-
-
 
 def gen_min_nomination_graph():
     global input_file
@@ -155,16 +152,15 @@ def gen_min_nomination_graph():
         label = '< ' + low
         ranges.append(label)
 
-
     plt.xlabel("Stake (in DOT/KSM)")
     plt.ylabel("Number of Validators")
     plt.title("Minimum Nomination Per Validator", fontsize=15)
     plt.bar(ranges, counts, color='#E6007A')
-    plt.xticks(rotation=20)
+    angle = min(number_of_bars//9, 6)
+    plt.xticks(rotation=15*angle)
     print(ranges)
     plt.savefig(output_file, dpi=300, bbox_inches='tight', pad_inches=.25)
     print("Saved Minimum Nomination Per Validator graph as", output_file)
-
 
 def gen_avg_nomination_graph():
     global input_file
@@ -198,12 +194,12 @@ def gen_avg_nomination_graph():
         label = '< ' + low
         ranges.append(label)
 
-
     plt.xlabel("Stake (in DOT/KSM)")
     plt.ylabel("Number of Validators")
     plt.title("Average Nomination Per Validator", fontsize=15)
     plt.bar(ranges, counts, color='#E6007A')
-    plt.xticks(rotation=20)
+    angle = min(number_of_bars//9, 6)
+    plt.xticks(rotation=15*angle)
     print(ranges)
     plt.savefig(output_file, dpi=300, bbox_inches='tight', pad_inches=.25)
     print("Saved Average Nomination Per Validator graph as", output_file)
