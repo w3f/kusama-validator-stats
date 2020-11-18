@@ -6,8 +6,8 @@ def isolateStake(line):
 
 
 
-def read_in_file():
-    with open('polkadot_out.txt') as f:
+def read_in_file(file_name):
+    with open(file_name) as f:
         for line in f:
             if line.startswith('\tTotal stake:'):
                 stake = isolateStake(line)
@@ -17,9 +17,10 @@ def read_in_file():
 stakes = []
 
 def main():
+    file_to_read = str(input("Enter the name of the input file(eg. polkadot_out.txt): "))
     number_of_bars = int(input("Enter the number of bars in the graph: "))
-    file_name = str(input("Enter an output file name(including .png): "))
-    read_in_file()
+    file_name = str(input("Enter an output file name(eg. validator_graph.png): "))
+    read_in_file(file_to_read)
     stakes.sort()
     min_stake = stakes[0]
     max_stake = stakes[len(stakes)-1]
@@ -43,16 +44,16 @@ def main():
         ranges.append(label)
 
 
-    plt.xlabel("Stake (in DOT)")
+    plt.xlabel("Stake (in DOT/KSM)", fontsize=10)
     plt.ylabel("Number of Validators")
-    plt.title("Validators")
-    plt.bar(ranges, counts)
+    plt.title("Validators by Stake")
+    plt.bar(ranges, counts, color='#E6007A')
     plt.xticks(rotation=15)
     # plt.setp(plt, rotation=30, horizontalalignment='right')
 
     print(ranges)
 
-    plt.savefig(file_name, bbox_inches='tight', pad_inches=1)
+    plt.savefig('validator_graph.png', bbox_inches='tight', pad_inches=.25)
 
 
 main()
