@@ -17,9 +17,26 @@ def read_in_file(file_name):
 stakes = []
 
 def main():
+    prompt = "Make a selection from the following options:"
+    prompt += "\n\t[1] Validator Stake Graph"
+    prompt += "\n\t[2] Minimal Nominator Graph"
+    prompt += "\n\t[3] Average Nominator Graph\n\tSelection: "
+    selection = int(input(prompt))
+    if selection == 1:
+        gen_validator_graph()
+    if selection == 2:
+        gen_min_nominator_graph()
+    if selection == 3:
+        gen_avg_nominator_graph()
+    else:
+        print("Invalid option")
+
+def gen_validator_graph():
     file_to_read = str(input("Enter the name of the input file(eg. polkadot_out.txt): "))
     number_of_bars = int(input("Enter the number of bars in the graph: "))
-    file_name = str(input("Enter an output file name(eg. validator_graph.png): "))
+    output_file = str(input("Enter an output file name(eg. validator_graph.png): "))
+    if(output_file) == '':
+        output_file = 'validator_graph.png' # default to this file name if omitted
     read_in_file(file_to_read)
     stakes.sort()
     min_stake = stakes[0]
@@ -39,8 +56,8 @@ def main():
     
     ranges = []
     for i in range(0, number_of_bars):
-        low = str(int(min_stake + bucket_size*(i+1)))
-        label = '<=' + low
+        low = "{:,}".format(int(min_stake + bucket_size*(i+1)))
+        label = '< ' + low
         ranges.append(label)
 
 
@@ -53,8 +70,7 @@ def main():
 
     print(ranges)
 
-    plt.savefig('validator_graph.png', bbox_inches='tight', pad_inches=.25)
-
+    plt.savefig(output_file, bbox_inches='tight', pad_inches=.25)
 
 main()
 
