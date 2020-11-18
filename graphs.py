@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
 
+plt.rc('xtick',labelsize=6)
+plt.rc('ytick',labelsize=6)
+
 def isolateStake(line):
     tokens = line.split()
     return float(tokens[2])
@@ -24,9 +27,9 @@ def main():
     selection = int(input(prompt))
     if selection == 1:
         gen_validator_graph()
-    if selection == 2:
+    elif selection == 2:
         gen_min_nominator_graph()
-    if selection == 3:
+    elif selection == 3:
         gen_avg_nominator_graph()
     else:
         print("Invalid option")
@@ -61,11 +64,11 @@ def gen_validator_graph():
         ranges.append(label)
 
 
-    plt.xlabel("Stake (in DOT/KSM)", fontsize=10)
+    plt.xlabel("Stake (in DOT/KSM)")
     plt.ylabel("Number of Validators")
-    plt.title("Validators by Stake")
+    plt.title("Validators by Stake", fontsize=15)
     plt.bar(ranges, counts, color='#E6007A')
-    plt.xticks(rotation=15)
+    plt.xticks(rotation=20)
     # plt.setp(plt, rotation=30, horizontalalignment='right')
 
     print(ranges)
