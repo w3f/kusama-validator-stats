@@ -73,7 +73,9 @@ def main():
         gen_avg_nomination_graph()
     elif selection ==4:
         gen_validator_total_stake()
+        plt.clf()
         gen_min_nomination_graph()
+        plt.clf()
         gen_avg_nomination_graph()
     else:
         print("Invalid option")
