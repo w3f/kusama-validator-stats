@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import sys
 
 # Set the font size of the axis labels for graphs
 plt.rc('xtick',labelsize=6)
@@ -58,6 +59,9 @@ def read_in_file_3(file_name):
 
 
 def main():
+    global input_file
+    if len(sys.argv) > 1 and sys.argv[1]:
+        input_file = sys.argv[1]
     prompt = "Make a selection from the following options:"
     prompt += "\n\t[1] Validator Total Stake Graph"
     prompt += "\n\t[2] Minimum Nomination Per Validator Graph"
