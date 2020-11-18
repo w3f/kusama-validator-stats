@@ -1,2 +1,4 @@
 .python-version
 *.png
+node_modules/
+*.txt
