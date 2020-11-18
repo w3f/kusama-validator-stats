@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 
+# Set the font size of the axis labels for graphs
 plt.rc('xtick',labelsize=6)
 plt.rc('ytick',labelsize=6)
 
@@ -42,6 +43,7 @@ def gen_validator_graph():
         output_file = 'validator_graph.png' # default to this file name if omitted
     read_in_file(file_to_read)
     stakes.sort()
+    # print(stakes)
     min_stake = stakes[0]
     max_stake = stakes[len(stakes)-1]
     diff = (max_stake - min_stake)
@@ -73,7 +75,7 @@ def gen_validator_graph():
 
     print(ranges)
 
-    plt.savefig(output_file, bbox_inches='tight', pad_inches=.25)
+    plt.savefig(output_file, dpi=300, bbox_inches='tight', pad_inches=.25)
 
 main()
 
