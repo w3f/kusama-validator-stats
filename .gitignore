@@ -2,3 +2,4 @@
 *.png
 node_modules/
 *.txt
+.vscode/
