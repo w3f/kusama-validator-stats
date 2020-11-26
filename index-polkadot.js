@@ -138,7 +138,7 @@ let lowestMinNominator = "no one";
       }
     }
 
-    console.log(`\tCommission: ${validatorCommissionRate['commission'].toString() / 10000000}%`)
+    console.log(`\tCommission: ${validatorCommissionRate['commission'].toString() / 10000000} %`)
     console.log('\tNominators:', validatorNominators.length)
     console.log(`\tMin Nominator: ${minNominator} : ${min / DOT_DECIMAL_PLACES} ${getSuffix()}`)
     console.log(`\tMax Nominator: ${maxNominator} : ${max / DOT_DECIMAL_PLACES} ${getSuffix()}`)
@@ -157,8 +157,8 @@ let lowestMinNominator = "no one";
   console.log(`Highest-staked validator: ${highest} : ${highestAmount} ${getSuffix()}`)
   console.log(`Lowest-staked validator: ${lowest} : ${lowestAmount} ${getSuffix()}`)
   console.log(`Lowest-staked(non-zero) validator: ${lowestNonZeroValidator} : ${lowestNonZeroAmount} ${getSuffix()}`)
-  console.log(`Highest commission validator: ${highestCommission} : ${highestCommissionAmount / 10000000}%`)
-  console.log(`Lowest commission validator: ${lowestCommission} : ${lowestCommissionAmount / 10000000}%`)
+  console.log(`Highest commission validator: ${highestCommission} : ${highestCommissionAmount / 10000000} % `)
+  console.log(`Lowest commission validator: ${lowestCommission} : ${lowestCommissionAmount / 10000000} %`)
 
   // part 3
   console.log(`Lowest Minimal Nominator: ${lowestMinNominator} : ${lowestMinStake / DOT_DECIMAL_PLACES} ${getSuffix()}`)
@@ -171,9 +171,9 @@ let lowestMinNominator = "no one";
 
   // part 4
   console.log(`Average Stake Per Validator: ${averageTotalStake} ${getSuffix()}`)
-  console.log(`Average Commission: ${averageCommission / 10000000}%`)
+  console.log(`Average Commission: ${averageCommission / 10000000} %`)
   console.log(`Average Stake (Among Non 100% Commission Validators): ${averageStakeNon100} ${getSuffix()}`)
-  console.log(`Average Commission (Among Non 100% Commission Validators): ${averageCommissionNon100}%`)
+  console.log(`Average Commission (Among Non 100% Commission Validators): ${averageCommissionNon100} %`)
 
 
 
