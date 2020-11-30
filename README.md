@@ -13,6 +13,10 @@ If no command line args are included, it defaults to the Polkadot network
 Include "kusama" as a command line argument to run this script on the Kusama network
 `node index-polkadot.js kusama`
 
+## Result
+
+![Kusama Staking Stat](https://i.imgur.com/ucKNVw4.png)
+
 # Graphs
 
 Make sure you have Python 3 installed.
@@ -35,7 +39,3 @@ eg. `python graphs.py polkadot_out.txt`
     - if no extension is provided, matplotlib defaults to .png
 
 
-
-# Result
-
-![Kusama Staking Stat](https://i.imgur.com/ucKNVw4.png)
