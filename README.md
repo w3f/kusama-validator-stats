@@ -26,9 +26,7 @@ eg. `node index-polkadot.js > polkadot_out.txt`
 To run the script to create graphs:
 `python graphs.py [input_file]`
 
-eg.
-
-`python graphs.py polkadot_out.txt`
+eg. `python graphs.py polkadot_out.txt`
 
 - input_file is an optional parameter, without it you will be prompted to enter the file name when the program runs
 - output file name can be omitted when prompted, the default name for each graph is shown as an example and will be used if no file name is provided
