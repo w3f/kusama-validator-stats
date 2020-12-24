@@ -33,7 +33,7 @@ def read_in_file_2(file_name):
     min_stakes = []
     with open(file_name) as f:
         for line in f:
-            if line.startswith('\tMin Nominator:'):
+            if line.startswith('\tMin Nominator:') and not line.startswith('\tMin Nominator: no one'):
                 min_stake = isolate_min_stake(line)
                 min_stakes.append(min_stake)
     return min_stakes
@@ -90,7 +90,7 @@ def gen_validator_total_stake():
         input_file = str(input("Enter the name of the input file(eg. polkadot_out.txt): "))
     number_of_bars = int(input("Enter the number of bars in the Total Stake graph: "))
     output_file = str(input("Enter an output file name(eg. validator_total_stake_graph.png): "))
-    if(output_file) == '':
+    if output_file == '':
         output_file = 'validator_total_stake_graph.png' # default to this file name if omitted
     stakes = read_in_file_1(input_file)
     stakes.sort()
@@ -132,7 +132,7 @@ def gen_min_nomination_graph():
         input_file = str(input("Enter the name of the input file(eg. polkadot_out.txt): "))
     number_of_bars = int(input("Enter the number of bars in the Min Stake graph: "))
     output_file = str(input("Enter an output file name(eg. min_nomination_graph.png): "))
-    if(output_file) == '':
+    if output_file == '':
         output_file = 'min_nomination_graph.png' # default to this file name if omitted
     min_stakes = read_in_file_2(input_file)
     min_stakes.sort()
@@ -174,7 +174,7 @@ def gen_avg_nomination_graph():
         input_file = str(input("Enter the name of the input file(eg. polkadot_out.txt): "))
     number_of_bars = int(input("Enter the number of bars in the Average Stake graph: "))
     output_file = str(input("Enter an output file name(eg. avg_nomination_graph.png): "))
-    if(output_file) == '':
+    if output_file == '':
         output_file = 'avg_nomination_graph.png' # default to this file name if omitted
     avg_stakes = read_in_file_3(input_file)
     avg_stakes.sort()
