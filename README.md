@@ -38,4 +38,9 @@ eg. `python graphs.py polkadot_out.txt`
     - eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff
     - if no extension is provided, matplotlib defaults to .png
 
+# Deltas
 
+deltas.js takes two files as arguments and shows the differences between both of the files
+
+To run the script:
+`node deltas.js <file_1> <file_2>`
