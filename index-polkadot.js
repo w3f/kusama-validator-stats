@@ -38,7 +38,7 @@ let lowestMinNominator = "no one";
     console.log('Connecting to Polkadot')
     provider = new WsProvider('wss://rpc.polkadot.io')
   }
-  const api = await ApiPromise.create({ provider })
+  let api = await ApiPromise.create({ provider })
   const [currentValidators, totalIssuance, currentEra] = await Promise.all([
     api.query.session.validators(),
     api.query.balances.totalIssuance(),
@@ -175,7 +175,13 @@ let lowestMinNominator = "no one";
   console.log(`Average Stake (Among Non 100% Commission Validators): ${averageStakeNon100} ${getSuffix()}`)
   console.log(`Average Commission (Among Non 100% Commission Validators): ${averageCommissionNon100} %`)
 
+  console.log('\nConnecting to Rococo')
+  provider = new WsProvider('wss://rococo-rpc.polkadot.io')
+  api = await ApiPromise.create({ provider })
+  const [parachains] = await Promise.all([api.query.paras.parachains()])
 
+  console.log('Total Parachains (Rococo):', parachains.length)
+  console.log(parachains.toString())
 
   process.exit()
 })()
